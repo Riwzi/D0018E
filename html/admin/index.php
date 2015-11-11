@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>e-buy</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src='js/main.js'></script>
+<script src='admin.js'></script>
+</head>
+
+<body>
+<h1 id='form_title'>Add product</h1>
+<form id='product_form' action='index.php' method='post'>
+    Product name:<br>
+    <input type='text' id='product_name' name='product_name'><br>
+    Price:<br>
+    <input type='text' id='product_price' name='product_price'><br>
+    <input type='hidden' id='product_id' name='product_id' value=''>
+    <input type='button' id='submit' value='Submit'>
+</form>
+
+<p id="responseText"></p>
+
+<table>
+<tr>
+    <th>Product</th>
+    <th>Price</th>
+    <th></th>
+</tr>
+<?php
+function displayProduct($row){
+$product_id = $row["product_id"];
+    echo    "<tr id='p$product_id'>
+                <td>" . $row["name"] . "</td>
+                <td>" . $row["price"] . "</td>
+                <td><input type='button' value='Modify'
+                    onclick='modifyProduct($product_id)'>
+                </td>
+                <td><input type='button' value='Remove'
+                    onclick='removeProduct($product_id)'>
+                </td>
+            </tr>";
+}
+
+$servername = "localhost";
+$username = "nilfit-3";
+$password = "nilfit-3";
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password);
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+
+
+$sql = "USE nilfit3db;";
+$conn->query($sql);
+$sql = "SELECT product_id, name, price FROM products";
+$result = $conn->query($sql);
+if ( $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        displayProduct($row);
+    }
+} else {
+    echo "No products found";
+}
+
+
+
+$conn->close();
+?>
+</table>
+</body>
+</html> 
