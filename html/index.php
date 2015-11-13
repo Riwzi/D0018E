@@ -23,23 +23,10 @@ function displayProduct($row){
             </tr>";
 }
 
-$servername = "localhost";
-$username = "nilfit-3";
-$password = "nilfit-3";
+require 'dbconnect.php';
+$conn = dbconnect();
 
-// Create connection
-$conn = mysqli_connect($servername, $username, $password);
-
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-
-
-$sql = "USE nilfit3db;";
-$conn->query($sql);
-$sql = "SELECT product_id, name, price FROM products";
+$sql = "SELECT product_id, name, price FROM shopdb.products";
 $result = $conn->query($sql);
 if ( $result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
