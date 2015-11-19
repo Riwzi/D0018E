@@ -6,7 +6,9 @@ function addProductSubmit(){
     $("#responseText").load("add.php",
         {
             product_name: $("#product_name").val(),
-            product_price: $("#product_price").val()
+            product_price: $("#product_price").val(),
+            product_desc: $("#product_desc").val(),
+            product_stock: $("#product_stock").val()
         }
         //todo callback that displays the new product
     );
@@ -17,7 +19,9 @@ function modifyProductSubmit(){
         {
             product_id: $("#product_id").val(),
             product_name: $("#product_name").val(),
-            product_price: $("#product_price").val()
+            product_price: $("#product_price").val(),
+            product_desc: $("#product_desc").val(),
+            product_stock: $("#product_stock").val()
         }
         //todo callback that displays the modified product
     );
@@ -25,6 +29,8 @@ function modifyProductSubmit(){
     $("#product_id").val("");
     $("#product_name").val("");
     $("#product_price").val("");
+    $("#product_desc").val("");
+    $("#product_stock").val("");
     $("#submit").attr("onclick", "addProductSubmit();");
 }
 
@@ -41,6 +47,8 @@ function modifyProduct(product_id){
     $("#form_title").text("Modify product " + product_id);
     $("#product_id").val(product_id);
     $("#product_name").val("Enter name here"); //todo use the name of the product instead
-    $("#product_price").val("Enter price here");
+    $("#product_price").val(0);
+    $("#product_desc").val("Description");
+    $("#product_stock").val(0);
     $("#submit").attr("onclick", "modifyProductSubmit();");
 }

@@ -13,7 +13,11 @@
     Product name:<br>
     <input type='text' id='product_name' name='product_name'><br>
     Price:<br>
-    <input type='text' id='product_price' name='product_price'><br>
+    <input type='number' id='product_price' name='product_price'><br>
+    Description (max 255 characters):<br>
+    <textarea rows='4' cols='52' id='product_desc' name='product_desc'></textarea><br>
+    Stock:<br>
+    <input type='number' id='product_stock' name='product_price'><br>
     <input type='hidden' id='product_id' name='product_id' value=''>
     <input type='button' id='submit' value='Submit'>
 </form>
@@ -30,8 +34,8 @@
 function displayProduct($row){
 $product_id = $row["product_id"];
     echo    "<tr id='p$product_id'>
-                <td>" . $row["name"] . "</td>
-                <td>" . $row["price"] . "</td>
+                <td>" . $row["product_name"] . "</td>
+                <td>" . $row["product_price"] . "</td>
                 <td><input type='button' value='Modify'
                     onclick='modifyProduct($product_id)'>
                 </td>
@@ -44,7 +48,7 @@ $product_id = $row["product_id"];
 require '../dbconnect.php';
 $conn = dbconnect();
 
-$sql = "SELECT product_id, name, price FROM shopdb.products";
+$sql = "SELECT product_id, product_name, product_price FROM shopdb.Products";
 $result = $conn->query($sql);
 if ( $result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {

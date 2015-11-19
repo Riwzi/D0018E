@@ -15,8 +15,8 @@
 <?php
 function displayProduct($row){
     echo    "<tr>
-                <td>" . $row["name"] . "</td>
-                <td>" . $row["price"] . "</td>
+                <td>" . $row["product_name"] . "</td>
+                <td>" . $row["product_price"] . "</td>
                 <td><input type='button' value='Buy!'
                     onclick='purchase(" . $row["product_id"] . ")'>
                 </td>
@@ -26,7 +26,7 @@ function displayProduct($row){
 require 'dbconnect.php';
 $conn = dbconnect();
 
-$sql = "SELECT product_id, name, price FROM shopdb.products";
+$sql = "SELECT product_id, product_name, product_price FROM shopdb.Products";
 $result = $conn->query($sql);
 if ( $result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
