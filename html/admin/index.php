@@ -45,22 +45,8 @@ $product_id = $row["product_id"];
             </tr>";
 }
 
-require '../dbconnect.php';
-$conn = dbconnect();
-
-$sql = "SELECT product_id, product_name, product_price FROM shopdb.Products";
-$result = $conn->query($sql);
-if ( $result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        displayProduct($row);
-    }
-} else {
-    echo "No products found";
-}
-
-
-
-$conn->close();
+require 'product_list.php';
+displayProductList(1, 'displayProduct');
 ?>
 </table>
 </body>
