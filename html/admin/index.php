@@ -32,7 +32,9 @@
 </tr>
 <?php
 function displayProduct($row){
-$product_id = $row["product_id"];
+    $product_id = $row["product_id"];
+    // each tr tag (row) has an id of p followed by the product id
+    // example: product_id 333 will have a row with id='p333'
     echo    "<tr id='p$product_id'>
                 <td>" . $row["product_name"] . "</td>
                 <td>" . $row["product_price"] . "</td>
@@ -45,7 +47,7 @@ $product_id = $row["product_id"];
             </tr>";
 }
 
-require 'product_list.php';
+require '../product_list.php';
 displayProductList(1, 'displayProduct');
 ?>
 </table>
