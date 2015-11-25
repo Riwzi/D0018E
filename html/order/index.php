@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
 <title>e-buy</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <style>
 .error {color: #FF0000;}
 </style>
@@ -12,14 +12,20 @@
 
 <h1>Complete your order</h1>
 <p><span class="error">* required field.</span></p>
-<form id="order_form" method="post" action="validate.php">
-    Name: <input type="text" name="order_name" pattern="/^[a-zA-Z]*$/" required>
+<form id="order_form" method="post" action="place.php">
+    First name: <input type="text" name="order_fname" pattern="^[a-zA-Z]*$" required>
+    <span class="error">*</span>
+    <br><br>
+    Last name: <input type="text" name="order_lname" pattern="^[a-zA-Z]*$" required>
+    <span class="error">*</span>
+    <br><br>
+    Personnumber: <input type="text" name="order_pnumber" pattern="(\d{2})?\d{6}\s?-?\d{4}" required>
     <span class="error">*</span>
     <br><br>
     E-mail: <input type="email" name="order_email" required>
     <span class="error">*</span> 
     <br><br>    
-    Address: <input type="text" name="order_addr" required>
+    Address: <input type="text" name="order_address" required>
     <span class="error">*</span>
     <br><br>
     Credit card number: <input type="text" name="order_credit" pattern="\s*(\d\s*){16}" required>
@@ -27,7 +33,6 @@
     <br><br>  
     <input type="submit" id="submit" value="Submit">
     <br><br>
-    <!-- ADD FORMS FOR FIRST/LAST NAME, PNUMBER -->
 </form>
 
 
