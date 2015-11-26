@@ -115,6 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Error 4, could not place order");
         }
     }
+    unset($_SESSION['basket']);
     
     $conn->close();
     

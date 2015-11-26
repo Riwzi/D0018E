@@ -1,2 +1,2 @@
-<a href='/'>Home</a>
-<a href='/basket/'>Basket</a>
+<a href='/'><button>Home</button></a>
+<a href='/basket/'><button>Basket</button></a>

@@ -54,5 +54,7 @@ $conn->close();
 ?>
 </table>
 <p id="responseText"></p>
+
+<a href='/order/'><button>Place order</button></a>
 </body>
 </html> 
