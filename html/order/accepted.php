@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>e-buy</title>
+<?php include "../menu.php";?>
 </head>
 
 <body>

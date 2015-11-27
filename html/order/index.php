@@ -6,6 +6,7 @@
 <style>
 .error {color: #FF0000;}
 </style>
+<?php include "../menu.php";?>
 </head>
 
 <body>
