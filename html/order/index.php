@@ -19,9 +19,6 @@
     Last name: <input type="text" name="order_lname" pattern="^[a-zA-Z]*$" required>
     <span class="error">*</span>
     <br><br>
-    Personnumber: <input type="text" name="order_pnumber" pattern="(\d{2})?\d{6}\s?-?\d{4}" required>
-    <span class="error">*</span>
-    <br><br>
     E-mail: <input type="email" name="order_email" required>
     <span class="error">*</span> 
     <br><br>    

@@ -16,7 +16,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $order_fname = $_REQUEST["order_fname"];
     $order_lname = $_REQUEST["order_lname"];
-    $order_pnumber = $_REQUEST["order_pnumber"];
     $order_email = $_REQUEST["order_email"];
     $order_address = $_REQUEST["order_address"];
     $order_credit = $_REQUEST["order_credit"];
@@ -37,15 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     
-    if (!empty($order_pnumber)) {
-        $order_pnumber = cleanInput($order_pnumber);
-        //removes all whitespaces and "-" from the string
-        $order_pnumber = preg_replace('/\s+/', '', $order_pnumber);
-        $order_pnumber = preg_replace('/-/', '', $order_pnumber);
-        if (!preg_match("/(\d{2})?\d{6}\s?-?\d{4}/",$order_pnumber)) {
-           die("Error, could not place order");
-        }
-    }
     
     if (!empty($order_email)) {
         $order_email = cleanInput($order_email);
@@ -74,29 +64,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = dbconnect();
     
     //Check if the customer already exists in the database
-    $sql = "SELECT * FROM shopdb.Customers WHERE customer_pnumber='$order_pnumber';";
+    $sql = "SELECT * FROM shopdb.Customers WHERE customer_email='$order_email';";
     $result = $conn->query($sql);
     //True if customer does not exist in the database
     if ($result->num_rows === 0){
-        $sql = "INSERT INTO shopdb.Customers (customer_pnumber, customer_fname, 
+        $sql = "INSERT INTO shopdb.Customers (customer_email, customer_fname, 
                                               customer_lname, customer_creditcard) 
-                VALUES($order_pnumber, '$order_fname', '$order_lname', '$order_credit');";
+                VALUES('$order_email', '$order_fname', '$order_lname', '$order_credit');";
         $result = $conn->query($sql);
         if($result == FALSE){
-            die("Error 1, could not place order");
+            die("Error 1, query was " . $sql . "    mysql error:  " . $conn->error);
         }
+        $sql = "SELECT MAX(customer_id) FROM shopdb.Customers;";
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+        $customer_id = $row["MAX(customer_id)"];
+    }
+    //Customer exists
+    else{
+        $row = $result->fetch_assoc();
+        $customer_id = $row["customer_id"];
     }
     
     //insert the order
-    $sql = "INSERT INTO shopdb.Orders (customer_pnumber, order_address)
-            VALUES ($order_pnumber, '$order_address');";
+    $sql = "INSERT INTO shopdb.Orders (customer_id, order_address)
+            VALUES ($customer_id, '$order_address');";
     $result = $conn->query($sql);
     if($result == FALSE){
         die("Error 2, could not place order");
     }
     
     //retrieve the newly generated order id
-    $sql = "SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_pnumber = $order_pnumber;";
+    $sql = "SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = $customer_id;";
     $result = $conn->query($sql);
     $row = $result->fetch_assoc();
     $order_id = $row["MAX(order_id)"];
