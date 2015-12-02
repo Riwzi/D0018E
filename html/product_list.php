@@ -5,6 +5,8 @@
 function displayProductList($page, $displayfn){
     require 'dbconnect.php';
     $conn = dbconnect();
+    $conn->autocommit(false);
+    $conn->begin_transaction();
 
     if ($page < 1){
         die("Product list page numbers can't be less than 1");
@@ -31,6 +33,7 @@ function displayProductList($page, $displayfn){
             echo "No products found";
         }
     }
+    $conn->commit();
     $conn->close();
 }
 ?>

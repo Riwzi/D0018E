@@ -1,6 +1,9 @@
 <?php
 require '../dbconnect.php';
 $conn = dbconnect();
+$conn->autocommit(false);
+$conn->begin_transaction();
+
 $product_id = $_POST["product_id"];
 $product_name = $_REQUEST["product_name"];
 $product_price = $_REQUEST["product_price"];
@@ -17,5 +20,6 @@ if ( $conn->query($sql) === TRUE) {
 } else {
     echo "Failed to execute command: " . $sql . "\nError message:". $conn->error;
 }
+$conn->commit();
 $conn->close();
 ?>

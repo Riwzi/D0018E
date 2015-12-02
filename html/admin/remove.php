@@ -1,6 +1,8 @@
 <?php
 require '../dbconnect.php';
 $conn = dbconnect();
+$conn->autocommit(false);
+$conn->begin_transaction();
 
 $product_id = $_REQUEST["product_id"];
 
@@ -10,6 +12,6 @@ if ( $conn->query($sql)) {
 } else {
     echo "Error: " . $conn->error;
 }
-
+$conn->commit();
 $conn->close();
 ?>

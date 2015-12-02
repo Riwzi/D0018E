@@ -35,6 +35,8 @@ function displayProduct($row, $count){
 
 require '../dbconnect.php';
 $conn = dbconnect();
+$conn->autocommit(false);
+$conn->begin_transaction();
 
 foreach($_SESSION['basket'] as $product_id => $count){
     $sql = 
@@ -49,6 +51,7 @@ foreach($_SESSION['basket'] as $product_id => $count){
     $row = $result->fetch_assoc();
     displayProduct($row, $count);
 }
+$conn->commit();
 //close database connection
 $conn->close();
 ?>

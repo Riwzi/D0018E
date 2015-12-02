@@ -59,9 +59,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     
-
+    //TODO remove the die() functions from below?
     require '../dbconnect.php';
     $conn = dbconnect();
+    $conn->autocommit(false);
+    $conn->begin_transaction();
     
     //Check if the customer already exists in the database
     $sql = "SELECT * FROM shopdb.Customers WHERE customer_email='$order_email';";
@@ -116,6 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     unset($_SESSION['basket']);
     
+    $conn->commit();
     $conn->close();
     
     //REDIRECT TO "THANK YOU" PAGE
