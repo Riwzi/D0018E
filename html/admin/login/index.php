@@ -1,8 +1,10 @@
 <?php
 session_start();
-if ($_SESSION['staff_login']){
-    alert('hey, you are already logged in! we should redirect you...');
-    // TODO do this properly
+//check if client is already logged in
+if (array_key_exists('staff_login', $_SESSION)){
+    // redirect
+    header("Location: ../");
+    die();
 }
 ?>
 <html>
@@ -15,9 +17,9 @@ if ($_SESSION['staff_login']){
 <body>
 <form id='login_form'>
     Username:<br>
-    <input type='text' id='username'><br>
+    <input type='text' name='username'><br>
     Password:<br>
-    <input type='password' id='password'><br>
+    <input type='password' name='password'><br>
     <input type='button' value='Login' onclick="login()">
 </form>
 <p id="responseText"></p>

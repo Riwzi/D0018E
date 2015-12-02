@@ -1,9 +1,7 @@
 <?php
 session_start();
-/*
-Will respond with a 200 status code on success and
-403 status code on failure
-*/
+/* respond with a 200 status code on success and
+403 status code on failure */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //set the header to be 403 by default
     header('HTTP/1.1 403 Forbidden');
