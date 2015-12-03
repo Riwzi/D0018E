@@ -43,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!filter_var($order_email, FILTER_VALIDATE_EMAIL)){
             die("Error, could not place order");
         }
-        
     }
     
     if (!empty($order_address)) {
@@ -66,64 +65,82 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->begin_transaction();
     
     //Check if the customer already exists in the database
-    $sql = "SELECT * FROM shopdb.Customers WHERE customer_email='$order_email';";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("SELECT customer_id FROM shopdb.Customers WHERE customer_email=?;");
+    $stmt->bind_param("s", $order_email);
+    $stmt->execute();
+    $stmt->store_result();
     //True if customer does not exist in the database
-    if ($result->num_rows === 0){
-        $sql = "INSERT INTO shopdb.Customers (customer_email, customer_fname, 
-                                              customer_lname, customer_creditcard) 
-                VALUES('$order_email', '$order_fname', '$order_lname', '$order_credit');";
-        $result = $conn->query($sql);
-        if($result == FALSE){
+    if ($stmt->num_rows === 0){
+        $stmt->close();
+        //insert the customer into the database
+        $stmt = $conn->prepare("INSERT INTO shopdb.Customers (customer_email, customer_fname, 
+                                                customer_lname, customer_creditcard) 
+                                                VALUES(?,?,?,?);");
+
+        $stmt->bind_param("ssss", $order_email, $order_fname, $order_lname, $order_credit);
+        $stmt->execute();
+        if($stmt == FALSE){
             die("Error 1, query was " . $sql . "    mysql error:  " . $conn->error);
         }
+        $stmt->close();
+        
+        //get the newly generated customer id
         $sql = "SELECT MAX(customer_id) FROM shopdb.Customers;";
         $result = $conn->query($sql);
         $row = $result->fetch_assoc();
         $customer_id = $row["MAX(customer_id)"];
+             
     }
     //Customer exists
     else{
-        $row = $result->fetch_assoc();
-        $customer_id = $row["customer_id"];
+        echo "customer exists";
+        $customer_id;
+        $stmt->bind_result($customer_id);
+        $stmt->fetch();
+        $stmt->close();
     }
     
     //insert the order
-    $sql = "INSERT INTO shopdb.Orders (customer_id, order_address)
-            VALUES ($customer_id, '$order_address');";
-    $result = $conn->query($sql);
-    if($result == FALSE){
-        die("Error 2, could not place order");
+    $stmt = $conn->prepare("INSERT INTO shopdb.Orders (customer_id, order_address)
+                            VALUES (?,?);");
+    $stmt->bind_param("is", $customer_id, $order_address);
+    if($stmt == FALSE){
+        echo "insert order fail";
     }
+    $stmt->execute();
+    $stmt->close();
     
     //retrieve the newly generated order id
-    $sql = "SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = $customer_id;";
-    $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
-    $order_id = $row["MAX(order_id)"];
-
-    if($result == FALSE){
-        die("Error 3, could not place order");
-    }
-    
+    $stmt = $conn->prepare("SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = $customer_id;");
+    $stmt->bind_param("i", $customer_id);
+    $stmt->execute();
+    $order_id = 0;
+    $stmt->bind_result($order_id);
+    $stmt->fetch();
+    $stmt->close();
     
     //Insert the shopping baskets
+    $stmt = $conn->prepare("INSERT INTO shopdb.ShoppingBasket
+                            (product_count, order_id, product_id)
+                            VALUES(?, ?, ?);");
     foreach($_SESSION['basket'] as $product_id => $count){
-        $sql = "INSERT INTO shopdb.ShoppingBasket
-            (product_count, order_id, product_id)
-            VALUES ($count, $order_id, $product_id);";
-        if($conn->query($sql) == FALSE){
-            die("Error 4, could not place order");
-        }
+        $stmt->bind_param("iii", $count, $order_id, $product_id);
+        $stmt->execute();
     }
-    unset($_SESSION['basket']);
+    $stmt->close();
     
     $conn->commit();
+    
+    //empty the basket after committing
+    //unset($_SESSION['basket']);
+    
     $conn->close();
     
     //REDIRECT TO "THANK YOU" PAGE
     header("Location: accepted.php");
     die();
+    
+    
 }
 
 

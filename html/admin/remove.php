@@ -1,17 +1,16 @@
 <?php
 require '../dbconnect.php';
 $conn = dbconnect();
-$conn->autocommit(false);
-$conn->begin_transaction();
 
 $product_id = $_REQUEST["product_id"];
 
-$sql = "DELETE FROM shopdb.Products WHERE product_id='$product_id'" ;
-if ( $conn->query($sql)) {
+$stmt = $conn->prepare("DELETE FROM shopdb.Products WHERE product_id=?;");
+$stmt->bind_param("i", $product_id);
+if ( $stmt->execute() == TRUE) {
     echo "Product removed";
 } else {
     echo "Error: " . $conn->error;
 }
-$conn->commit();
+$stmt->close();
 $conn->close();
 ?>

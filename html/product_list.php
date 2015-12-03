@@ -5,9 +5,8 @@
 function displayProductList($page, $displayfn){
     require 'dbconnect.php';
     $conn = dbconnect();
-    $conn->autocommit(false);
-    $conn->begin_transaction();
-
+    $firstproduct = ($page-1)*20;
+    
     if ($page < 1){
         die("Product list page numbers can't be less than 1");
     } elseif ($page = 1){ //use the frontpage view
@@ -21,19 +20,27 @@ function displayProductList($page, $displayfn){
             echo "No products found";
         }
     } else {
-        $sql = "SELECT product_id, product_name, product_price
+        $stmt = $conn->prepare("SELECT product_id, product_name, product_price
                 FROM shopdb.Products
-                LIMIT " . ($page - 1) . ", 20;";
-        $result = $conn->query($sql);
-        if ( $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
+                LIMIT ?, 20;");
+        
+        $stmt->bind_param("i", $firstproduct);
+        $stmt->execute();
+        
+        $stmt->store_result();
+        $stmt->get_result();
+        
+        if ( $stmt->num_rows > 0) {
+            while($row = $stmt->fetch_assoc()) {
                 $displayfn($row);
             }
         } else {
             echo "No products found";
         }
+        
+        $stmt->close();
+        
     }
-    $conn->commit();
     $conn->close();
 }
 ?>
