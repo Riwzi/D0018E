@@ -128,19 +128,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
     }
     $stmt->close();
-    
     $conn->commit();
     
     //empty the basket after committing
-    //unset($_SESSION['basket']);
+    unset($_SESSION['basket']);
     
     $conn->close();
     
     //REDIRECT TO "THANK YOU" PAGE
     header("Location: accepted.php");
     die();
-    
-    
 }
 
 
