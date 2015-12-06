@@ -32,12 +32,10 @@ function displayProduct($row, $count){
                 </td>
             </tr>";
 }
-
 require '../dbconnect.php';
 $conn = dbconnect();
 $conn->autocommit(false);
 $conn->begin_transaction();
-
 foreach($_SESSION['basket'] as $product_id => $count){
     $sql = 
     "SELECT *
