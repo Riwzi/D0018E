@@ -23,27 +23,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $fname = cleanInput($fname);
     // check if name only contains letters and whitespace
-    if (!preg_match("/^[a-zA-Z ]*$/",$order_fname) || empty($fname)) {
-       die("Error, could not create account");
+    if (!preg_match("/^[a-zA-Z ]*$/",$fname) || empty($fname)) {
+       die("Error, could not create account: fname");
     }
     $lname = cleanInput($lname);
     // check if name only contains letters and whitespace
-    if (!preg_match("/^[a-zA-Z ]*$/",$order_lname) || empty($lname)) {
-      die("Error, could not create account");
+    if (!preg_match("/^[a-zA-Z ]*$/",$lname) || empty($lname)) {
+      die("Error, could not create account: lname");
     }
     $email = cleanInput($email);
-    if (!filter_var($order_email, FILTER_VALIDATE_EMAIL) || empty($email)){
-        die("Error, could not create account");
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || empty($email)){
+        die("Error, could not create account: email=" . $email);
     }
-    $order_address = cleanInput($order_address);
+    $address = cleanInput($address);
     if (empty($address)) {
-        die("Error, could not create account");
+        die("Error, could not create account: address");
     }
-    $order_credit = cleanInput($order_credit);
+    $credit = cleanInput($credit);
     //removes all whitespaces from the string
-    $order_credit = preg_replace('/\s+/', '', $order_credit);
-    if (!preg_match("\d{16}", $order_credit) || empty($order_credit)) {
-            die("Error, could not create account");
+    $credit = preg_replace('/\s+/', '', $credit);
+    if (!preg_match("/\d{16}/", $credit) || empty($credit)) {
+        die("Error, could not create account: credit=$credit");
     }
     
     
@@ -54,18 +54,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     //Check if the customer already exists in the database
     $stmt = $conn->prepare("SELECT customer_id FROM shopdb.Customers WHERE customer_email=?;");
-    $stmt->bind_param("s", $order_email);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
+
     //True if customer does not exist in the database
     if ($stmt->num_rows === 0){
         $stmt->close();
         //insert the customer into the database
         $stmt = $conn->prepare("INSERT INTO shopdb.Customers (customer_email, customer_fname, 
-                                                customer_lname, customer_creditcard) 
-                                                VALUES(?,?,?,?);");
+                                                customer_lname, customer_creditcard, customer_address) 
+                                                VALUES(?,?,?,?,?);");
 
-        $stmt->bind_param("ssss", $email, $fname, $lname, $credit);
+        $stmt->bind_param("sssis", $email, $fname, $lname, $credit, $address);
         $stmt->execute();
         if($stmt == FALSE){
             die("Error 1, query was " . $sql . "    mysql error:  " . $conn->error);
@@ -77,15 +78,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $conn->query($sql);
         $row = $result->fetch_assoc();
         $customer_id = $row["MAX(customer_id)"];
-             
     }
     //Customer exists
     else{
-        echo "customer exists";
-        $customer_id;
-        $stmt->bind_result($customer_id);
-        $stmt->fetch();
+        $stmt->close();
+        $stmt = $conn->prepare("UPDATE shopdb.Customers
+                                SET customer_fname=?, customer_lname=?,
+                                customer_creditcard=?, customer_address=?
+                                WHERE customer_email=?;");
+        $stmt->bind_param("ssiss", $fname, $lname, $credit, $address, $email);
+        $stmt->execute();
         $stmt->close();
     }
-    
-
+    //add the login entry
+    $stmt = $conn->prepare("INSERT INTO shopdb.LoginCustomer
+                            (customer_email, user_password_sha2_512)
+                            VALUES(?,sha2(?,512));");
+    $stmt->bind_param("ss", $email, $password);
+    $stmt->execute();
+    $conn->commit();
+    $conn->close();
+    // Redirect to login
+    header("Location: ../");
+/**/
+}

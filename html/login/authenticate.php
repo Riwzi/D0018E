@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_REQUEST["password"];
     require '../dbconnect.php';
     $conn = dbconnect();
-    $stmt = $conn->prepare("SELECT count(customer_email) FROM shopdb.LoginStaff
+    $stmt = $conn->prepare("SELECT count(customer_email) FROM shopdb.LoginCustomer
         WHERE customer_email=? AND user_password_sha2_512=sha2(?, 512);");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();

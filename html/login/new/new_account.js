@@ -12,22 +12,3 @@ $(document).ready(function(){
         }
     });
 });
-
-
-
-function create_account(){
-    $.post("create_account.php", $("#account_form").serialize())
-        // success function
-        .done(function(){
-            // redirect
-            window.location = "../";
-        })
-        // received an error
-        // note: .done and .fail have the parameters of the callback in different orders
-        .fail(function(request){
-            // server responds with 403 if there was a problem
-            if (request.status == 403){
-                alert('Username and password do not match \n');
-            }
-        });
-}

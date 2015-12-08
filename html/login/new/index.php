@@ -9,20 +9,9 @@
 </head>
 
 <body>
-<!--
-<form id='account_form'>
-    E-mail:<br>
-    <input type='email' id='username' name='username'><br>
-    Password:<br>
-    <input type='password' id='password' name='password'><br>
-    Password (again):<br>
-    <input type='password' id='password2' name='password2'><br>
-    <input type='button' value="Create account" onclick="create_account()">
-</form>
--->
 <h1>Create account</h1>
 <p><span class="error">* required field.</span></p>
-<form id="account_form" method="post" action="place.php">
+<form id="account_form" method="post" action="create_account.php">
     First name: <input type="text" name="fname" pattern="^[a-zA-Z]*$" required>
     <span class="error">*</span>
     <br><br>
