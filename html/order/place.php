@@ -67,7 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //Check if the customer already exists in the database
     $stmt = $conn->prepare("SELECT customer_id FROM shopdb.Customers WHERE customer_email=?;");
     $stmt->bind_param("s", $order_email);
-    $stmt->execute();
+    if (!$stmt->execute()){
+        rollbackTransaction($conn);
+    }
     $stmt->store_result();
     //True if customer does not exist in the database
     if ($stmt->num_rows === 0){
@@ -78,7 +80,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 VALUES(?,?,?,?);");
 
         $stmt->bind_param("ssss", $order_email, $order_fname, $order_lname, $order_credit);
-        $stmt->execute();
+        if (!$stmt->execute()){
+            rollbackTransaction($conn);
+        }
         if($stmt == FALSE){
             die("Error 1, query was " . $sql . "    mysql error:  " . $conn->error);
         }
@@ -107,13 +111,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if($stmt == FALSE){
         echo "insert order fail";
     }
-    $stmt->execute();
+    if (!$stmt->execute()){
+        rollbackTransaction($conn);
+    }
     $stmt->close();
     
     //retrieve the newly generated order id
     $stmt = $conn->prepare("SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = $customer_id;");
     $stmt->bind_param("i", $customer_id);
-    $stmt->execute();
+    if (!$stmt->execute()){
+        rollbackTransaction($conn);
+    }
     $order_id = 0;
     $stmt->bind_result($order_id);
     $stmt->fetch();
@@ -125,14 +133,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             VALUES(?, ?, ?);");
     foreach($_SESSION['basket'] as $product_id => $count){
         $stmt->bind_param("iii", $count, $order_id, $product_id);
-        $stmt->execute();
+        if (!$stmt->execute()){
+            rollbackTransaction($conn);
+        }
     }
     $stmt->close();
     $conn->commit();
-    
     //empty the basket after committing
     unset($_SESSION['basket']);
-    
     $conn->close();
     
     //REDIRECT TO "THANK YOU" PAGE
@@ -148,8 +156,14 @@ function cleanInput($input){
    return $output;
 }
 
+//Rollbacks the transaction and redirects to "try again" page
+function rollbackTransaction($conn){
+    $conn->close();
+    header("Location: failed.php");
+    die();
+}
+
 ?>
 
 </body>
 </html>
-

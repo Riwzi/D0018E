@@ -27,6 +27,9 @@ function displayProduct($row){
                 <td><input type='button' value='Add'
                     onclick='basket_add(" . $row["product_id"] . ")'>
                 </td>
+                <td><a href='/products?id=".$row["product_id"]."'>
+                    <button>More info</button></a>
+                </td>
             </tr>";
 }
 
