@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            die("Error, could not place order");
         }
     }
-    
+
     if (!empty($order_lname)) {
         $order_lname = cleanInput($order_lname);
         // check if name only contains letters and whitespace
@@ -35,8 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           die("Error, could not place order");
         }
     }
-    
-    
+
+
     if (!empty($order_email)) {
         $order_email = cleanInput($order_email);
         
@@ -44,16 +44,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Error, could not place order");
         }
     }
-    
+
     if (!empty($order_address)) {
         $order_address = cleanInput($order_address);
     }
 
-    if (empty($order_credit)) {
+    if (!empty($order_credit)) {
         $order_credit = cleanInput($order_credit);
         //removes all whitespaces from the string
         $order_credit = preg_replace('/\s+/', '', $order_credit);
-        if (!preg_match("\d{16}", $order_credit)){
+        if (!preg_match("/\d{16}/", $order_credit)){
             die("Error, could not place order");
         }
     }
@@ -71,15 +71,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         rollbackTransaction($conn);
     }
     $stmt->store_result();
+
     //True if customer does not exist in the database
     if ($stmt->num_rows === 0){
         $stmt->close();
         //insert the customer into the database
         $stmt = $conn->prepare("INSERT INTO shopdb.Customers (customer_email, customer_fname, 
-                                                customer_lname, customer_creditcard) 
-                                                VALUES(?,?,?,?);");
-
-        $stmt->bind_param("ssss", $order_email, $order_fname, $order_lname, $order_credit);
+                                                customer_lname, customer_creditcard,
+                                                customer_address) 
+                                                VALUES(?,?,?,?,?);");
+        $stmt->bind_param("sssis", $order_email, $order_fname, $order_lname, $order_credit, $order_address);
         if (!$stmt->execute()){
             rollbackTransaction($conn);
         }
@@ -93,7 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $conn->query($sql);
         $row = $result->fetch_assoc();
         $customer_id = $row["MAX(customer_id)"];
-             
     }
     //Customer exists
     else{
@@ -103,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
         $stmt->close();
     }
-    
+
     //insert the order
     $stmt = $conn->prepare("INSERT INTO shopdb.Orders (customer_id, order_address)
                             VALUES (?,?);");
@@ -115,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         rollbackTransaction($conn);
     }
     $stmt->close();
-    
+
     //retrieve the newly generated order id
     $stmt = $conn->prepare("SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = $customer_id;");
     $stmt->bind_param("i", $customer_id);
@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_result($order_id);
     $stmt->fetch();
     $stmt->close();
-    
+
     //Insert the shopping baskets
     $stmt = $conn->prepare("INSERT INTO shopdb.ShoppingBasket
                             (product_count, order_id, product_id)
@@ -142,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //empty the basket after committing
     unset($_SESSION['basket']);
     $conn->close();
-    
+
     //REDIRECT TO "THANK YOU" PAGE
     header("Location: accepted.php");
     die();
