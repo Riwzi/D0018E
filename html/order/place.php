@@ -63,8 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = dbconnect();
     $conn->autocommit(false);
     $conn->begin_transaction();
-    //Variable for determining whether to commit or rollback
-    $queries_successful = TRUE;
     
     //Check if the customer already exists in the database
     $stmt = $conn->prepare("SELECT customer_id FROM shopdb.Customers WHERE customer_email=?;");
