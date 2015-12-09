@@ -27,6 +27,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            die("Error, could not place order");
         }
     }
+    else {
+        orderFailed();
+    }
 
     if (!empty($order_lname)) {
         $order_lname = cleanInput($order_lname);
@@ -35,18 +38,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           die("Error, could not place order");
         }
     }
-
+    else {
+        orderFailed();
+    }
 
     if (!empty($order_email)) {
         $order_email = cleanInput($order_email);
         
-        if (!filter_var($order_email, FILTER_VALIDATE_EMAIL)){
+        if (!preg_match("/[a-zA-Z0-9#!$%&'*+=?^_`{}~\-\/]+@[a-zA-Z0-9.-]+/", $order_email)) {
             die("Error, could not place order");
         }
+    }
+    else {
+        orderFailed();
     }
 
     if (!empty($order_address)) {
         $order_address = cleanInput($order_address);
+    }
+    else {
+        orderFailed();
     }
 
     if (!empty($order_credit)) {
@@ -57,8 +68,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Error, could not place order");
         }
     }
+    else {
+        orderFailed();
+    }
     
-    //TODO remove the die() functions from below?
     require '../dbconnect.php';
     $conn = dbconnect();
     $conn->autocommit(false);
@@ -68,7 +81,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare("SELECT customer_id FROM shopdb.Customers WHERE customer_email=?;");
     $stmt->bind_param("s", $order_email);
     if (!$stmt->execute()){
-        rollbackTransaction($conn);
+        $conn->close();
+        orderFailed();
     }
     $stmt->store_result();
 
@@ -82,10 +96,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 VALUES(?,?,?,?,?);");
         $stmt->bind_param("sssis", $order_email, $order_fname, $order_lname, $order_credit, $order_address);
         if (!$stmt->execute()){
-            rollbackTransaction($conn);
-        }
-        if($stmt == FALSE){
-            die("Error 1, query was " . $sql . "    mysql error:  " . $conn->error);
+            $conn->close();
+            orderFailed();
         }
         $stmt->close();
         
@@ -112,7 +124,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "insert order fail";
     }
     if (!$stmt->execute()){
-        rollbackTransaction($conn);
+        $conn->close();
+        orderFailed();
     }
     $stmt->close();
 
@@ -120,7 +133,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare("SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = $customer_id;");
     $stmt->bind_param("i", $customer_id);
     if (!$stmt->execute()){
-        rollbackTransaction($conn);
+        $conn->close();
+        orderFailed();
     }
     $order_id = 0;
     $stmt->bind_result($order_id);
@@ -134,7 +148,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     foreach($_SESSION['basket'] as $product_id => $count){
         $stmt->bind_param("iii", $count, $order_id, $product_id);
         if (!$stmt->execute()){
-            rollbackTransaction($conn);
+            $conn->close();
+            orderFailed();
         }
     }
     $stmt->close();
@@ -157,8 +172,7 @@ function cleanInput($input){
 }
 
 //Rollbacks the transaction and redirects to "try again" page
-function rollbackTransaction($conn){
-    $conn->close();
+function orderFailed(){
     header("Location: failed.php");
     die();
 }
