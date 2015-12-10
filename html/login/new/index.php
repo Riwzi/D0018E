@@ -19,7 +19,7 @@
     Last name: <input type="text" name="lname" pattern="^[a-zA-Z]*$" required>
     <span class="error">*</span>
     <br><br>
-    E-mail: <input type="email" name="email" pattern="[a-zA-Z0-9#!$%&'*+=?^_`{}~\-\/]+@[a-zA-Z0-9.-]+" required>
+    E-mail: <input type="email" name="email" required>
     <span class="error">*</span> 
     <br><br>
     Password:

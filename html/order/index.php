@@ -23,7 +23,7 @@ session_start();
     Last name: <input type="text" name="order_lname" pattern="^[a-zA-Z]*$" required>
     <span class="error">*</span>
     <br><br>
-    E-mail: <input type="email" name="order_email" pattern="[a-zA-Z0-9#!$%&'*+=?^_`{}~\-\/]+@[a-zA-Z0-9.-]+" required>
+    E-mail: <input type="email" name="order_email" required>
     <span class="error">*</span> 
     <br><br>    
     Address: <input type="text" name="order_address" required>
