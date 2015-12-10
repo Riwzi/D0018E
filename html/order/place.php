@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 
     //retrieve the newly generated order id
-    $stmt = $conn->prepare("SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = $customer_id;");
+    $stmt = $conn->prepare("SELECT MAX(order_id) FROM shopdb.Orders WHERE customer_id = ?;");
     $stmt->bind_param("i", $customer_id);
     if (!$stmt->execute()){
         $conn->close();
