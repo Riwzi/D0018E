@@ -4,7 +4,7 @@
 */
 if (!array_key_exists('staff_login', $_SESSION)){
     //redirect to index of this folder
-    header("Location: ./login");
+    header("Location: /admin/login");
     die();
 }
 
