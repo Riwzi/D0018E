@@ -8,7 +8,7 @@
 <body>
 <h1>Something went wrong! Please try again</h1>
 
-<a href='/order'><button>Continue</button></a>
+<a href='/'><button>Return to homepage</button></a>
 
 </body>
 </html>
