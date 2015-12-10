@@ -109,7 +109,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     //Customer exists
     else{
-        echo "customer exists";
         $customer_id;
         $stmt->bind_result($customer_id);
         $stmt->fetch();
@@ -120,9 +119,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare("INSERT INTO shopdb.Orders (customer_id, order_address)
                             VALUES (?,?);");
     $stmt->bind_param("is", $customer_id, $order_address);
-    if($stmt == FALSE){
-        echo "insert order fail";
-    }
     if (!$stmt->execute()){
         $conn->close();
         orderFailed();
