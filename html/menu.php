@@ -9,3 +9,4 @@ else{
     echo "<a href='/login/logout.php'><button>Logout</button></a>";
 }
 ?>
+<br>
