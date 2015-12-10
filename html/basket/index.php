@@ -56,6 +56,14 @@ $conn->close();
 </table>
 <p id="responseText"></p>
 
-<a href='/order/'><button>Place order</button></a>
+<?php
+//if the user is logged in, place the order without the form
+if (array_key_exists('customer_login', $_SESSION)){
+    echo "<a href='/order/place_express.php'><button>Place order</button></a>";
+} // if the user is not logged in, send them to the normal form
+else{
+    echo "<a href='/order/'><button>Place order ??slow??</button></a>";
+}
+?>
 </body>
 </html> 
