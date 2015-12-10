@@ -9,6 +9,7 @@
 </head>
 
 <body>
+<?php include "../../menu.php";?>
 <h1>Create account</h1>
 <p><span class="error">* required field.</span></p>
 <form id="account_form" method="post" action="create_account.php">
@@ -18,7 +19,7 @@
     Last name: <input type="text" name="lname" pattern="^[a-zA-Z]*$" required>
     <span class="error">*</span>
     <br><br>
-    E-mail: <input type="email" name="email" required>
+    E-mail: <input type="email" name="email" pattern="[a-zA-Z0-9#!$%&'*+=?^_`{}~\-\/]+@[a-zA-Z0-9.-]+" required>
     <span class="error">*</span> 
     <br><br>
     Password:

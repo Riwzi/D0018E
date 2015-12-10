@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       die("Error, could not create account: lname");
     }
     $email = cleanInput($email);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || empty($email)){
+    if (!preg_match("/[a-zA-Z0-9#!$%&'*+=?^_`{}~\-\/]+@[a-zA-Z0-9.-]+/", $email) || empty($email)){
         die("Error, could not create account: email=" . $email);
     }
     $address = cleanInput($address);
@@ -51,7 +51,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = dbconnect();
     $conn->autocommit(false);
     $conn->begin_transaction();
-    
+
+    $stmt = $conn->prepare("SELECT count(customer_email) FROM shopdb.LoginCustomer
+        WHERE customer_email=?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $matches = -1;
+    $stmt->bind_result($matches);
+    $stmt->fetch();
+    $stmt->close();
+    if($matches != 0){
+        die("Error when creating account: e-mail address is already in use.");
+    }
     //Check if the customer already exists in the database
     $stmt = $conn->prepare("SELECT customer_id FROM shopdb.Customers WHERE customer_email=?;");
     $stmt->bind_param("s", $email);
@@ -79,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $row = $result->fetch_assoc();
         $customer_id = $row["MAX(customer_id)"];
     }
-    //Customer exists
+    //Customer exists, but does not have an account yet
     else{
         $stmt->close();
         $stmt = $conn->prepare("UPDATE shopdb.Customers
