@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $order_fname = cleanInput($order_fname);
         // check if name only contains letters and whitespace
         if (!preg_match("/^[a-zA-Z ]*$/",$order_fname)) {
-           die("Error, could not place order");
+           orderFailed();
         }
     }
     else {
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $order_lname = cleanInput($order_lname);
         // check if name only contains letters and whitespace
         if (!preg_match("/^[a-zA-Z ]*$/",$order_lname)) {
-          die("Error, could not place order");
+          orderFailed();
         }
     }
     else {
@@ -44,9 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($order_email)) {
         $order_email = cleanInput($order_email);
-        
+        //Check if the email is valid
         if (!preg_match("/[a-zA-Z0-9#!$%&'*+=?^_`{}~\-\/]+@[a-zA-Z0-9.-]+/", $order_email)) {
-            die("Error, could not place order");
+            orderFailed();
         }
     }
     else {
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         //removes all whitespaces from the string
         $order_credit = preg_replace('/\s+/', '', $order_credit);
         if (!preg_match("/\d{16}/", $order_credit)){
-            die("Error, could not place order");
+            orderFailed();
         }
     }
     else {
