@@ -55,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $stmt->fetch();
     
     $conn->commit();
+    $stmt->close();
     
     echo "<br><b>Product name:</b>
         <br> ".$product_name."<br>
@@ -71,10 +72,67 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     if (array_key_exists('customer_login', $_SESSION)){
         echo "<button>+</button> <button>-</button>";
     }
-    //TODO show comments    
-    //query all root comments, for each of those, recursively query all comments with that comment as parent
-        
-    $stmt->close();
+    echo "<br><b>Comments:</b><br>";
+    
+    //The reply_number variable determines how much indentation/padding the comment will have
+    function displayComment($comment_text, $comment_fname, $comment_lname, $reply_number){
+        $output = $comment_text." -".$comment_fname." ".$comment_lname."<br>";
+        echo str_repeat("&nbsp", 4*$reply_number).$output;
+    }
+    
+    //gets all replies to the comment with it parent_id and gets the replies to those replies
+    function getReply($conn, $parent_id, $reply_number){
+        $sql = "SELECT comment_text, customer_id, comment_id
+            FROM shopdb.ProductComments WHERE comment_parent_id=$parent_id;";
+        $result = $conn->query($sql);
+        //Loops until there are no more comments with the same parent
+        while ($row = $result->fetch_assoc()){
+            $customer_id = $row["customer_id"];
+            $comment_text = $row["comment_text"];
+            $comment_id = $row["comment_id"];
+            //retrieve the name of the commenter
+            $sql = "SELECT customer_fname, customer_lname FROM shopdb.Customers
+                WHERE customer_id=$customer_id;";
+            $result = $conn->query($sql);
+            $row = $result->fetch_assoc();
+            $comment_fname = $row["customer_fname"];
+            $comment_lname = $row["customer_lname"];
+            //display the comment
+            displayComment($comment_text, $comment_fname, $comment_lname, $reply_number);
+            //retrieve any replies to this comment
+            getReply($conn, $comment_id, $reply_number+1);
+        }
+    }
+    
+    //This function gets the comments with null parents
+    function getRootComments($conn, $product_id, $reply_number){
+        $stmt = $conn->prepare("SELECT comment_text, customer_id, comment_id 
+            FROM shopdb.ProductComments 
+            WHERE product_id=$product_id AND comment_parent_id IS NULL;");
+        $stmt->execute();
+        $stmt->bind_result($comment_text, $customer_id, $comment_id);
+        $stmt->store_result();
+        //Loops until there are no more comments with the same parent
+        while ($stmt->fetch()){
+            //retrieve the name of the commenter
+            $stmt2 = $conn->prepare("SELECT customer_fname, customer_lname FROM shopdb.Customers
+                WHERE customer_id=$customer_id;");
+            $stmt2->execute();
+            $stmt2->bind_result($comment_fname, $comment_lname);
+            $stmt2->fetch();
+            $stmt2->close();
+            //display the comment
+            displayComment($comment_text, $comment_fname, $comment_lname, $reply_number);
+            //retrieve any replies to this comment
+            getReply($conn, $comment_id, $reply_number+1);
+        }
+        $stmt->free_result();
+        $stmt->close();
+    }
+    $conn->autocommit(false);
+    $conn->begin_transaction();
+    getRootComments($conn, $product_id, null, 0);
+    $conn->commit();
     $conn->close();
 }
 ?>

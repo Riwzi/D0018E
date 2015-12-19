@@ -5,8 +5,6 @@ function commentSubmit(){
             if( $('parent').length ){
                 $('#comment_form').remove('#parent');
             }
-            //spårutskrift för att se om .post faktiskt lyckades (gör inte det just nu)
-            $("#responseText").text('success');
         });
 }
 
