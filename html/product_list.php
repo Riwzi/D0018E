@@ -7,7 +7,7 @@ error_reporting(E_ALL | E_STRICT);
 // Displays the requested page of the product list. Page 1 is the first page.
 // $displayfn should be a function that outputs the data from
 // one row of the table.
-function displayProductList($page, $displayfn){
+function displayProductList($displayfn){
     require 'dbconnect.php';
     $conn = dbconnect();
 
@@ -19,7 +19,7 @@ function displayProductList($page, $displayfn){
 
     $firstproduct = ($page-1)*20;
     if ($page < 1){
-        die("Product list page numbers can't be less than 1");
+        die("<tr><td>Product list page numbers can't be less than 1</td></tr>");
     } elseif ($page == 1){ //use the frontpage view
         $sql = "SELECT * FROM shopdb.FrontPageProducts";
         $result = $conn->query($sql);
@@ -54,7 +54,7 @@ function displayProductList($page, $displayfn){
                 $displayfn($row);
             }
         } else {
-            echo "No products found";
+            echo "<tr><td>No products found</td></tr>";
         }
         
         $stmt->close();

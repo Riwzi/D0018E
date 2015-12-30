@@ -7,3 +7,4 @@ if (array_key_exists('page', $_REQUEST)){
 ?>
 <a href='?page=<?php echo ($page-1);?>'><button>Previous page</button></a>
 <a href='?page=<?php echo ($page+1);?>'><button>Next page</button></a>
+<br>
