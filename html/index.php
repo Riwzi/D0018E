@@ -37,6 +37,9 @@ require 'product_list.php';
 displayProductList(1, 'displayProduct');
 ?>
 </table>
+<?php
+require 'pages.php';
+?>
 <p id="responseText"></p>
 </body>
 </html> 
