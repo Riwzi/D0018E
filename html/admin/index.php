@@ -26,7 +26,7 @@ require './login/require_login.php';
 </form>
 
 <p id="responseText"></p>
-
+<?php require '../pages.php'; ?>
 <table>
 <tr>
     <th>Product</th>
@@ -51,8 +51,11 @@ function displayProduct($row){
 }
 
 require '../product_list.php';
-displayProductList(1, 'displayProduct');
+displayProductList('displayProduct');
 ?>
 </table>
+<?php
+require '../pages.php';
+?>
 </body>
 </html> 

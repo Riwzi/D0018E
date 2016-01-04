@@ -12,6 +12,7 @@ session_start();
 <body>
 <?php
 include './menu.php';
+require 'pages.php';
 ?>
 <table>
 <tr>
@@ -34,9 +35,12 @@ function displayProduct($row){
 }
 
 require 'product_list.php';
-displayProductList(1, 'displayProduct');
+displayProductList('displayProduct');
 ?>
 </table>
+<?php
+require 'pages.php';
+?>
 <p id="responseText"></p>
 </body>
 </html> 
