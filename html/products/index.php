@@ -67,17 +67,21 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         <br> ".$product_desc."<br>
         <b>Product rating:</b>
         <br>Positive: ". $positive ." Negative: ". $negative."";
-    
-    //TODO add functionality to the buttons    
-    if (array_key_exists('customer_login', $_SESSION)){
-        echo "<button>+</button> <button>-</button>";
-    }
-    echo "<br><b>Comments:</b><br>";
-    
+        
+?>    
+<form id='rate_form'>
+    <input type="hidden" name="rating" id="rating" value="">
+    <input type="hidden" name="product_id" value="<?php echo $product_id;?>">
+    <input type="button" value="+" onclick="rateProduct(1)">
+    <input type="button" value="-" onclick="rateProduct(0)">
+</form>
+<b>Comments:</b><br>
+<?php
     //The reply_number variable determines how much indentation/padding the comment will have
-    function displayComment($comment_text, $comment_fname, $comment_lname, $reply_number){
-        $output = $comment_text." -".$comment_fname." ".$comment_lname."<br>";
+    function displayComment($comment_text, $comment_fname, $comment_lname, $reply_number, $comment_id){
+        $output = $comment_text." -".$comment_fname." ".$comment_lname;
         echo str_repeat("&nbsp", 4*$reply_number).$output;
+        echo "<input type='button' value='Reply' onclick='replyToComment($comment_id)'><br>";
     }
     
     //gets all replies to the comment with it parent_id and gets the replies to those replies
@@ -93,12 +97,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             //retrieve the name of the commenter
             $sql = "SELECT customer_fname, customer_lname FROM shopdb.Customers
                 WHERE customer_id=$customer_id;";
-            $result = $conn->query($sql);
-            $row = $result->fetch_assoc();
+            $result2 = $conn->query($sql);
+            $row = $result2->fetch_assoc();
             $comment_fname = $row["customer_fname"];
             $comment_lname = $row["customer_lname"];
             //display the comment
-            displayComment($comment_text, $comment_fname, $comment_lname, $reply_number);
+            displayComment($comment_text, $comment_fname, $comment_lname, $reply_number, $comment_id);
             //retrieve any replies to this comment
             getReply($conn, $comment_id, $reply_number+1);
         }
@@ -122,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $stmt2->fetch();
             $stmt2->close();
             //display the comment
-            displayComment($comment_text, $comment_fname, $comment_lname, $reply_number);
+            displayComment($comment_text, $comment_fname, $comment_lname, $reply_number, $comment_id);
             //retrieve any replies to this comment
             getReply($conn, $comment_id, $reply_number+1);
         }
@@ -138,12 +142,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 ?>
 
 <!-- Should submitting a comment be above or below the other comments? --> 
-<br><b>Submit a comment:</b><br>
+<br><b id='comment_form_title'>Submit a comment:</b><br>
 <form id='comment_form'>
-    <textarea style="resize:none" name="comment" cols="64" rows="4" maxlength="256"></textarea>
+    <textarea style="resize:none" name="comment" cols="64" rows="4" maxlength="256" required></textarea>
     <input type="hidden" name="product_id" value="<?php echo $product_id;?>">
     <input type="button" value="Comment" onclick="commentSubmit()">
 </form>
-<p id="responseText"></p>
 </body>
 </html>
