@@ -112,7 +112,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     function getRootComments($conn, $product_id, $reply_number){
         $stmt = $conn->prepare("SELECT comment_text, customer_id, comment_id 
             FROM shopdb.ProductComments 
-            WHERE product_id=$product_id AND comment_parent_id IS NULL;");
+            WHERE product_id=? AND comment_parent_id IS NULL;");
+        $stmt->bind_param("i",$product_id);
         $stmt->execute();
         $stmt->bind_result($comment_text, $customer_id, $comment_id);
         $stmt->store_result();
@@ -120,7 +121,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         while ($stmt->fetch()){
             //retrieve the name of the commenter
             $stmt2 = $conn->prepare("SELECT customer_fname, customer_lname FROM shopdb.Customers
-                WHERE customer_id=$customer_id;");
+                WHERE customer_id=?;");
+            $stmt2->bind_param("i",$customer_id);
             $stmt2->execute();
             $stmt2->bind_result($comment_fname, $comment_lname);
             $stmt2->fetch();
