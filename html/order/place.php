@@ -1,16 +1,5 @@
 <?php
 session_start();
-?>
-
-<!DOCTYPE HTML>
-<html>
-<head>
-<title>e-buy</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-</head>
-
-<body>
-<?php
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
@@ -147,6 +136,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->close();
             orderFailed();
         }
+        $stmt2 = $conn->prepare("UPDATE shopdb.Products SET product_stock=product_stock-? WHERE product_id=?");
+        $stmt2->bind_param("ii", $count, $product_id);
+        $stmt2->execute();
+        $stmt2->close();
     }
     $stmt->close();
     $conn->commit();
@@ -174,6 +167,3 @@ function orderFailed(){
 }
 
 ?>
-
-</body>
-</html>
